@@ -421,20 +421,7 @@
                     </select>
                 </div>
                 
-                <!-- פעולות ניהול -->
-                <div style="background: #ffebee; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <h3 style="color: #d32f2f; margin-bottom: 10px;">⚠️ פעולות ניהול</h3>
-                    <div style="background: white; padding: 12px; border-radius: 5px; margin-bottom: 10px;">
-                        <p style="color: #666; margin-bottom: 10px;">
-                            <strong>איפוס מערכת:</strong> פעולה זו תסמן את כל המחשבים כהוחזרו ותנקה את בסיס הנתונים.
-                            השתמש בזה בסוף כל יום/שבוע לאיפוס המערכת.
-                        </p>
-                        <button class="btn" id="resetSystemBtn" style="background: #d32f2f; color: white; width: 100%; padding: 15px; font-size: 1.1em; font-weight: bold;">
-                            🗑️ איפוס מערכת - כל המחשבים הוחזרו
-                        </button>
-                    </div>
-                </div>
-                
+                     
                 <div class="button-group">
                     <button class="btn btn-secondary" id="backToMain1">חזרה</button>
                     <button class="btn btn-primary" id="nextToDate">הבאה</button>
@@ -494,7 +481,7 @@
                 </div>
                 
                 <div class="computer-section" id="computerSection" style="display: none;">
-                    <h4>בחרי מחשבים זמינים:</h4>
+                    <h4>בחר מחשבים זמינים:</h4>
                     <div class="computer-count-info" id="computerCountInfo">
                         נבחרו: 0 מתוך <span id="requiredCount">0</span>
                     </div>
@@ -980,6 +967,12 @@
             });
         }
         
+        // Clean unwanted buttons and messages - DISABLED FOR NOW
+        function cleanUnwantedButtons() {
+            // פונקציה מבוטלת זמנית כדי למנוע מחיקת תוכן רגיל
+            console.log('ניקוי מבוטל זמנית');
+        }
+        
         // Show Screen
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
@@ -990,18 +983,33 @@
         
         // Show Error Message
         function showError(message) {
+            // הסר הודעות שגיאה קודמות
             const existingErrors = document.querySelectorAll('.error-message');
             existingErrors.forEach(error => error.remove());
+            
+            // צור הודעת שגיאה חדשה רק אם ההודעה תקינה
+            if (!message || message.trim() === '') return;
             
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error-message';
             errorDiv.textContent = message;
+            errorDiv.style.background = '#ffebee';
+            errorDiv.style.color = '#c62828';
+            errorDiv.style.padding = '12px';
+            errorDiv.style.borderRadius = '8px';
+            errorDiv.style.margin = '10px 0';
+            errorDiv.style.borderRight = '4px solid #f44336';
             
             const activeScreen = document.querySelector('.screen.active');
-            activeScreen.insertBefore(errorDiv, activeScreen.firstChild);
+            if (activeScreen) {
+                activeScreen.insertBefore(errorDiv, activeScreen.firstChild);
+            }
             
+            // הסר אחרי 4 שניות
             setTimeout(() => {
-                errorDiv.remove();
+                if (errorDiv.parentNode) {
+                    errorDiv.remove();
+                }
             }, 4000);
         }
         
@@ -1078,17 +1086,29 @@
             const selectedCount = selectedComputers.length;
             const requiredCount = currentLoan.computerCount || 0;
             
-            document.getElementById('computerCountInfo').innerHTML = 
-                `נבחרו: ${selectedCount} מתוך <span id="requiredCount">${requiredCount}</span>`;
+            const countInfo = document.getElementById('computerCountInfo');
+            if (countInfo) {
+                countInfo.innerHTML = `נבחרו: ${selectedCount} מתוך <span id="requiredCount">${requiredCount}</span>`;
+            }
         }
         
         // Update Submit Button
         function updateSubmitButton() {
             const submitBtn = document.getElementById('submitLoan');
+            if (!submitBtn) return;
+            
             const selectedCount = selectedComputers.length;
             const requiredCount = currentLoan.computerCount || 0;
             
             submitBtn.disabled = selectedCount !== requiredCount;
+            
+            if (selectedCount === requiredCount && selectedCount > 0) {
+                submitBtn.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+                submitBtn.textContent = 'שלח השאלה';
+            } else {
+                submitBtn.style.background = '#ccc';
+                submitBtn.textContent = `בחר ${requiredCount - selectedCount} מחשבים נוספים`;
+            }
         }
 
         // Load Active Loans for Return
@@ -1215,16 +1235,21 @@
             currentLoans.forEach(loan => {
                 const cartName = systemData.carts[loan.cart]?.name || loan.cart;
                 html += `
-                    <div style="background: white; padding: 10px; margin: 5px 0; border-radius: 5px; border-right: 4px solid #ff9800;">
-                        <div style="font-weight: bold; color: #333;">👩‍🏫 ${loan.teacherName} - כיתה ${loan.teacherClass}</div>
-                        <div style="font-size: 0.9em; color: #666;">
-                            📅 ${loan.loanDate} • ⏰ ${loan.loanTime} • 🖥️ ${loan.computers ? loan.computers.length : 0} מחשבים • 🛒 ${cartName}
-                        </div>
-                        ${loan.computers && loan.computers.length > 0 ? `
-                            <div style="font-size: 0.8em; color: #999; margin-top: 5px;">
-                                מחשבים: ${loan.computers.slice(0, 5).join(', ')}${loan.computers.length > 5 ? ` ו-${loan.computers.length - 5} נוספים...` : ''}
+                    <div style="background: white; padding: 10px; margin: 5px 0; border-radius: 5px; border-right: 4px solid #ff9800; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; color: #333;">👩‍🏫 ${loan.teacherName} - כיתה ${loan.teacherClass}</div>
+                            <div style="font-size: 0.9em; color: #666;">
+                                📅 ${loan.loanDate} • ⏰ ${loan.loanTime} • 🖥️ ${loan.computers ? loan.computers.length : 0} מחשבים • 🛒 ${cartName}
                             </div>
-                        ` : ''}
+                            ${loan.computers && loan.computers.length > 0 ? `
+                                <div style="font-size: 0.8em; color: #999; margin-top: 5px;">
+                                    מחשבים: ${loan.computers.slice(0, 5).join(', ')}${loan.computers.length > 5 ? ` ו-${loan.computers.length - 5} נוספים...` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <button onclick="returnSpecificLoan('${loan.id}')" style="background: #4CAF50; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-right: 10px; font-size: 0.9em;">
+                            ✅ החזר
+                        </button>
                     </div>
                 `;
             });
@@ -1306,17 +1331,19 @@
             container.innerHTML = html;
         }
         
-        function markAllAsReturned() {
-            // בדיקה אם יש השאלות פעילות
-            const activeLoans = systemData.loans.filter(loan => !loan.returned);
+        function returnSpecificLoan(loanId) {
+            // מצא את ההשאלה
+            const loanIndex = systemData.loans.findIndex(loan => loan.id == loanId);
             
-            if (activeLoans.length === 0) {
-                alert('ℹ️ אין השאלות פעילות לסימון');
+            if (loanIndex === -1) {
+                alert('❌ השאלה לא נמצאה!');
                 return;
             }
             
-            // בקשת אישור
-            const confirm = window.confirm(`⚠️ האם לסמן את כל ${activeLoans.length} ההשאלות הפעילות כהוחזרו?\n\nפעולה זו תשחרר את כל המחשבים.`);
+            const loan = systemData.loans[loanIndex];
+            
+            // בקש אישור
+            const confirm = window.confirm(`⚠️ האם לסמן את ההשאלה של ${loan.teacherName} כהוחזרה?\n\n${loan.computers ? loan.computers.length : 0} מחשבים ישוחררו.`);
             
             if (!confirm) return;
             
@@ -1324,44 +1351,37 @@
                 const currentDate = new Date().toISOString().split('T')[0];
                 const currentTime = new Date().toTimeString().split(' ')[0].substring(0, 5);
                 
-                let returnedCount = 0;
-                
-                // סמן את כל ההשאלות הפעילות כהוחזרו
-                systemData.loans.forEach(loan => {
-                    if (!loan.returned) {
-                        loan.returned = true;
-                        loan.returnDate = currentDate;
-                        loan.returnTime = currentTime;
-                        loan.returnNotes = 'סימון אוטומטי - כל המחשבים הוחזרו';
-                        loan.returnedAt = new Date().toISOString();
-                        returnedCount++;
-                    }
-                });
+                // עדכן את ההשאלה כהוחזרה
+                systemData.loans[loanIndex].returned = true;
+                systemData.loans[loanIndex].returnDate = currentDate;
+                systemData.loans[loanIndex].returnTime = currentTime;
+                systemData.loans[loanIndex].returnNotes = 'החזרה ממסך ניהול';
+                systemData.loans[loanIndex].returnedAt = new Date().toISOString();
                 
                 // שמור בענן
                 saveToFirebase();
                 
-                // עדכן את מסך הניהול
+                // עדכן את התצוגה
                 updateManagementData();
                 
                 // הודעת הצלחה
-                alert(`✅ בוצע בהצלחה!\n\n${returnedCount} השאלות סומנו כהוחזרו.\nכל המחשבים זמינים כעת.`);
+                alert(`✅ הושלם!\n\nההשאלה של ${loan.teacherName} סומנה כהוחזרה.\n${loan.computers ? loan.computers.length : 0} מחשבים שוחררו.`);
                 
-                console.log(`✅ סומנו כהוחזרו: ${returnedCount} השאלות`);
+                console.log(`✅ הוחזרה השאלה: ${loan.teacherName} - ${loan.computers ? loan.computers.length : 0} מחשבים`);
                 
             } catch (error) {
-                console.error('❌ שגיאה בסימון השאלות:', error);
-                alert('❌ שגיאה בסימון ההשאלות. נסה שוב.');
+                console.error('❌ שגיאה בהחזרת השאלה:', error);
+                alert('❌ שגיאה בהחזרת ההשאלה. נסה שוב.');
             }
         }
-
+        
         // Navigation Functions
         function goToDateScreen() {
             const teacherName = document.getElementById('teacherName').value;
             const teacherClass = document.getElementById('teacherClass').value;
             
             if (!teacherName || !teacherClass) {
-                showError('אנא בחרי מורה וכיתה');
+                showError('אנא בחר מורה וכיתה');
                 return;
             }
             
@@ -1377,7 +1397,7 @@
             const computerCount = document.getElementById('computerCount').value;
             
             if (!loanDate || !loanTime || !computerCount) {
-                showError('אנא מלאי את כל השדות');
+                showError('אנא מלא את כל השדות');
                 return;
             }
             
@@ -1392,7 +1412,7 @@
             const teacherName = document.getElementById('returnTeacher').value;
             
             if (!teacherName) {
-                showError('אנא בחרי מורה');
+                showError('אנא בחר מורה');
                 return;
             }
             
@@ -1406,7 +1426,7 @@
             const selectedCart = document.getElementById('cartSelect').value;
             
             if (!selectedCart || selectedComputers.length !== currentLoan.computerCount) {
-                showError('אנא בחרי עגלה ומספר המחשבים הנדרש');
+                showError('אנא בחר עגלה ומספר המחשבים הנדרש');
                 return;
             }
             
@@ -1434,7 +1454,7 @@
             const returnNotes = document.getElementById('returnNotes').value;
             
             if (!selectedLoanForReturn || !returnDate || !returnTime) {
-                showError('אנא בחרי השאלה ומלאי את כל השדות הנדרשים');
+                showError('אנא בחר השאלה ומלא את כל השדות הנדרשים');
                 return;
             }
             
@@ -1457,6 +1477,9 @@
             // Reset
             selectedLoanForReturn = null;
         }
+        
+        // Global function for return buttons (needed for onclick)
+        window.returnSpecificLoan = returnSpecificLoan;
         
         // Event Listeners
         function setupEventListeners() {
@@ -1503,9 +1526,6 @@
             document.getElementById('backToMainFromManagement').addEventListener('click', () => showScreen('mainScreen'));
             document.getElementById('refreshManagement').addEventListener('click', updateManagementData);
             
-            // Reset system button
-            document.getElementById('markAllReturnedBtn').addEventListener('click', markAllAsReturned);
-            
             // Password screen - Enter key support
             document.getElementById('adminPassword').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
@@ -1516,7 +1536,7 @@
         
         // Initialize System
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔄 מאתחלת מערכת...');
+            console.log('🔄 מאתחל מערכת...');
             
             // Populate select options from config
             populateSelectOptions();
@@ -1539,6 +1559,11 @@
             
             // Initialize Firebase
             initFirebase();
+            
+            // נקה כפתורים מיותרים
+            setTimeout(() => {
+                cleanUnwantedButtons();
+            }, 500);
             
             console.log('✅ המערכת מוכנה לשימוש');
         });
