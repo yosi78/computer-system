@@ -303,19 +303,47 @@
             margin-bottom: 20px;
             border-right: 4px solid #f44336;
         }
-        
-        .github-info {
-            background: #f0f8ff;
-            border: 1px solid #2196F3;
+
+        .loans-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
             border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            text-align: center;
+            margin-top: 15px;
         }
-        
-        .github-info h4 {
-            color: #1976D2;
-            margin-bottom: 10px;
+
+        .loan-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .loan-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .loan-item.selected {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196F3;
+        }
+
+        .loan-header {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .loan-details {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .no-loans {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-style: italic;
         }
         
         @media (max-width: 480px) {
@@ -347,7 +375,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="connection-status" id="connectionStatus">🔄 מתחבר...</div>
+            <div class="connection-status" id="connectionStatus">🔄 מתחברת...</div>
             <h1>🖥️ מערכת השאלת מחשבים</h1>
             <p>ניהול פשוט ויעיל</p>
         </div>
@@ -356,89 +384,13 @@
             <!-- מסך ראשי -->
             <div id="mainScreen" class="screen active">
                 <div class="main-options">
-                    <h2>בחר פעולה</h2>
+                    <h2>בחרי פעולה</h2>
                     <button class="option-btn" id="loanBtn">
                         📝 השאלת מחשבים
                     </button>
                     <button class="option-btn return" id="returnBtn">
                         ↩️ החזרת מחשבים
                     </button>
-                </div>
-                
-                <div class="github-info">
-                    <h4>💡 רוצה שהמערכת תעבוד מכל מקום?</h4>
-                    <p>העלה את הקובץ ל-GitHub Pages והמערכת תהיה זמינה מכל מחשב!</p>
-                    <button onclick="showGitHubInstructions()" style="background: #4CAF50; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
-                        📖 מדריך GitHub
-                    </button>
-                </div>
-            </div>
-            
-            <!-- מסך מדריך GitHub -->
-            <div id="githubScreen" class="screen">
-                <h2 class="screen-title">📖 מדריך GitHub Pages</h2>
-                
-                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <h4 style="color: #2e7d32; margin-bottom: 10px;">✨ מה תקבל:</h4>
-                    <ul style="padding-right: 20px; line-height: 1.8;">
-                        <li>🌐 <strong>כתובת אינטרנט קבועה</strong> - גישה מכל מקום</li>
-                        <li>🔥 <strong>Firebase יעבוד מושלם</strong> - סנכרון ענן מלא</li>
-                        <li>👥 <strong>שיתוף קל</strong> - תן קישור למורים אחרים</li>
-                        <li>💾 <strong>גיבוי אוטומטי</strong> - GitHub שומר הכל</li>
-                        <li>🆓 <strong>חינמי לחלוטין!</strong></li>
-                    </ul>
-                </div>
-                
-                <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <h4 style="color: #f57c00; margin-bottom: 10px;">📋 השלבים (10 דקות):</h4>
-                    
-                    <p><strong>שלב 1: הכנה</strong></p>
-                    <ol style="padding-right: 20px; margin-bottom: 15px;">
-                        <li>שמור את הקוד הזה בקובץ בשם <code style="background: #333; color: white; padding: 2px 5px; border-radius: 3px;">index.html</code></li>
-                        <li>חשוב! בדיוק השם הזה - <strong>index.html</strong></li>
-                    </ol>
-                    
-                    <p><strong>שלב 2: GitHub</strong></p>
-                    <ol style="padding-right: 20px; margin-bottom: 15px;">
-                        <li>היכנס ל-<a href="https://github.com" target="_blank" style="color: #1976D2;">github.com</a></li>
-                        <li>צור חשבון חינמי (אם אין לך)</li>
-                        <li>לחץ על כפתור <strong>"New"</strong> הירוק</li>
-                        <li>שם לפרויקט: <code style="background: #333; color: white; padding: 2px 5px; border-radius: 3px;">computer-system</code></li>
-                        <li>וודא ש-<strong>"Public"</strong> מסומן</li>
-                        <li>לחץ <strong>"Create repository"</strong></li>
-                    </ol>
-                    
-                    <p><strong>שלב 3: העלאה</strong></p>
-                    <ol style="padding-right: 20px; margin-bottom: 15px;">
-                        <li>לחץ <strong>"uploading an existing file"</strong></li>
-                        <li>גרור את <code>index.html</code> לתיבה</li>
-                        <li>בתחתית כתוב: "Added computer system"</li>
-                        <li>לחץ <strong>"Commit changes"</strong></li>
-                    </ol>
-                    
-                    <p><strong>שלב 4: הפעלת האתר</strong></p>
-                    <ol style="padding-right: 20px;">
-                        <li>לחץ על <strong>"Settings"</strong> (למעלה)</li>
-                        <li>בתפריט השמאלי לחץ <strong>"Pages"</strong></li>
-                        <li>ב-"Source" בחר <strong>"Deploy from a branch"</strong></li>
-                        <li>בחר <strong>"main"</strong> branch</li>
-                        <li>לחץ <strong>"Save"</strong></li>
-                        <li>חכה 2-5 דקות ותקבל כתובת!</li>
-                    </ol>
-                </div>
-                
-                <div style="background: #f3e5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                    <h4 style="color: #7b1fa2; margin-bottom: 10px;">🎯 התוצאה:</h4>
-                    <p style="margin-bottom: 10px;">תקבל כתובת כמו:</p>
-                    <code style="background: #333; color: #4CAF50; padding: 10px; display: block; border-radius: 5px; text-align: center; font-size: 0.9em;">
-                        https://yourusername.github.io/computer-system
-                    </code>
-                    <p style="margin-top: 10px; font-weight: bold; color: #7b1fa2;">🔥 Firebase יעבוד אוטומטית!</p>
-                </div>
-                
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="showScreen('mainScreen')">חזרה</button>
-                    <button class="btn btn-primary" onclick="window.open('https://github.com/new', '_blank')">🚀 צור Repository</button>
                 </div>
             </div>
             
@@ -455,40 +407,20 @@
                 <div class="form-group">
                     <label for="teacherName">שם המורה:</label>
                     <select id="teacherName" required>
-                        <option value="">בחר מורה...</option>
-                        <option value="מרים כהן">מרים כהן</option>
-                        <option value="דני לוי">דני לוי</option>
-                        <option value="שרה מזרחי">שרה מזרחי</option>
-                        <option value="אבי רוזן">אבי רוזן</option>
-                        <option value="רחל גולן">רחל גולן</option>
-                        <option value="יוסי אבני">יוסי אבני</option>
-                        <option value="נועה כרמי">נועה כרמי</option>
-                        <option value="משה ברק">משה ברק</option>
+                        <option value="">בחרי מורה...</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label for="teacherClass">כיתה:</label>
                     <select id="teacherClass" required>
-                        <option value="">בחר כיתה...</option>
-                        <option value="א'">א'</option>
-                        <option value="ב'">ב'</option>
-                        <option value="ג'">ג'</option>
-                        <option value="ד'">ד'</option>
-                        <option value="ה'">ה'</option>
-                        <option value="ו'">ו'</option>
-                        <option value="ז'">ז'</option>
-                        <option value="ח'">ח'</option>
-                        <option value="ט'">ט'</option>
-                        <option value="י'">י'</option>
-                        <option value="יא'">יא'</option>
-                        <option value="יב'">יב'</option>
+                        <option value="">בחרי כיתה...</option>
                     </select>
                 </div>
                 
                 <div class="button-group">
                     <button class="btn btn-secondary" id="backToMain1">חזרה</button>
-                    <button class="btn btn-primary" id="nextToDate">הבא</button>
+                    <button class="btn btn-primary" id="nextToDate">הבאה</button>
                 </div>
             </div>
             
@@ -510,39 +442,20 @@
                 <div class="form-group">
                     <label for="loanTime">שעת השאלה:</label>
                     <select id="loanTime" required>
-                        <option value="">בחר שעה...</option>
-                        <option value="08:00">08:00</option>
-                        <option value="09:00">09:00</option>
-                        <option value="10:00">10:00</option>
-                        <option value="11:00">11:00</option>
-                        <option value="12:00">12:00</option>
-                        <option value="13:00">13:00</option>
-                        <option value="14:00">14:00</option>
-                        <option value="15:00">15:00</option>
-                        <option value="16:00">16:00</option>
+                        <option value="">בחרי שעה...</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label for="computerCount">מספר מחשבים מבוקש:</label>
                     <select id="computerCount" required>
-                        <option value="">בחר כמות...</option>
-                        <option value="1">1 מחשב</option>
-                        <option value="2">2 מחשבים</option>
-                        <option value="3">3 מחשבים</option>
-                        <option value="4">4 מחשבים</option>
-                        <option value="5">5 מחשבים</option>
-                        <option value="10">10 מחשבים</option>
-                        <option value="15">15 מחשבים</option>
-                        <option value="20">20 מחשבים</option>
-                        <option value="25">25 מחשבים</option>
-                        <option value="30">כל המחשבים</option>
+                        <option value="">בחרי כמות...</option>
                     </select>
                 </div>
                 
                 <div class="button-group">
                     <button class="btn btn-secondary" id="backToTeacher">חזרה</button>
-                    <button class="btn btn-primary" id="nextToComputer">הבא</button>
+                    <button class="btn btn-primary" id="nextToComputer">הבאה</button>
                 </div>
             </div>
             
@@ -559,15 +472,12 @@
                 <div class="form-group">
                     <label for="cartSelect">עגלה:</label>
                     <select id="cartSelect" required>
-                        <option value="">בחר עגלה...</option>
-                        <option value="cart1">עגלה #1</option>
-                        <option value="cart2">עגלה #2</option>
-                        <option value="cart3">עגלה #3</option>
+                        <option value="">בחרי עגלה...</option>
                     </select>
                 </div>
                 
                 <div class="computer-section" id="computerSection" style="display: none;">
-                    <h4>בחר מחשבים זמינים:</h4>
+                    <h4>בחרי מחשבים זמינים:</h4>
                     <div class="computer-count-info" id="computerCountInfo">
                         נבחרו: 0 מתוך <span id="requiredCount">0</span>
                     </div>
@@ -576,43 +486,68 @@
                 
                 <div class="button-group">
                     <button class="btn btn-secondary" id="backToDate">חזרה</button>
-                    <button class="btn btn-primary" id="submitLoan" disabled>שלח</button>
+                    <button class="btn btn-primary" id="submitLoan" disabled>שלחי</button>
                 </div>
             </div>
             
-            <!-- מסך החזרה -->
-            <div id="returnScreen" class="screen">
-                <h2 class="screen-title">החזרת מחשבים</h2>
+            <!-- מסך החזרה - שלב 1: בחירת מורה -->
+            <div id="returnTeacherScreen" class="screen">
+                <div class="step-indicator">
+                    <div class="step active">1</div>
+                    <div class="step">2</div>
+                </div>
+                
+                <h2 class="screen-title">החזרת מחשבים - בחירת מורה</h2>
                 
                 <div class="form-group">
+                    <label for="returnTeacher">איזו מורה מחזירה מחשבים:</label>
+                    <select id="returnTeacher" required>
+                        <option value="">בחרי מורה...</option>
+                    </select>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" id="backToMainFromReturn1">חזרה</button>
+                    <button class="btn btn-primary" id="nextToReturnLoanSelect">הבאה</button>
+                </div>
+            </div>
+            
+            <!-- מסך החזרה - שלב 2: בחירת השאלה -->
+            <div id="returnLoanSelectScreen" class="screen">
+                <div class="step-indicator">
+                    <div class="step completed">1</div>
+                    <div class="step active">2</div>
+                </div>
+                
+                <h2 class="screen-title">בחירת השאלה להחזרה</h2>
+                
+                <div class="form-group">
+                    <label>השאלות פעילות של <span id="selectedTeacherName"></span>:</label>
+                    <div class="loans-list" id="activeLoansList">
+                        <div class="no-loans">טוענת השאלות...</div>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="returnDetailsSection" style="display: none;">
                     <label for="returnDate">תאריך החזרה:</label>
                     <input type="date" id="returnDate" required>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group" id="returnTimeSection" style="display: none;">
                     <label for="returnTime">שעת החזרה:</label>
                     <select id="returnTime" required>
-                        <option value="">בחר שעה...</option>
-                        <option value="08:00">08:00</option>
-                        <option value="09:00">09:00</option>
-                        <option value="10:00">10:00</option>
-                        <option value="11:00">11:00</option>
-                        <option value="12:00">12:00</option>
-                        <option value="13:00">13:00</option>
-                        <option value="14:00">14:00</option>
-                        <option value="15:00">15:00</option>
-                        <option value="16:00">16:00</option>
+                        <option value="">בחרי שעה...</option>
                     </select>
                 </div>
                 
-                <div class="form-group">
-                    <label for="returnNotes">הערות (אופציונאלי):</label>
-                    <textarea id="returnNotes" rows="4" placeholder="הערות נוספות..."></textarea>
+                <div class="form-group" id="returnNotesSection" style="display: none;">
+                    <label for="returnNotes">הערות (אופציונלי):</label>
+                    <textarea id="returnNotes" rows="3" placeholder="הערות נוספות..."></textarea>
                 </div>
                 
                 <div class="button-group">
-                    <button class="btn btn-secondary" id="backToMain2">חזרה</button>
-                    <button class="btn btn-primary" id="submitReturn">אשר החזרה</button>
+                    <button class="btn btn-secondary" id="backToReturnTeacher">חזרה</button>
+                    <button class="btn btn-primary" id="submitReturn" disabled>אשרי החזרה</button>
                 </div>
             </div>
             
@@ -628,6 +563,9 @@
         </div>
     </div>
 
+    <!-- קובץ הגדרות -->
+    <script src="config.js"></script>
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -648,25 +586,57 @@
         let app, database;
         let isConnected = false;
         let systemData = {
-            carts: {
-                cart1: {
-                    name: "עגלה #1",
-                    computers: generateComputerList("PC1", 15)
-                },
-                cart2: {
-                    name: "עגלה #2",
-                    computers: generateComputerList("PC2", 15)
-                },
-                cart3: {
-                    name: "עגלה #3",
-                    computers: generateComputerList("PC3", 10)
-                }
-            },
+            carts: {},
             loans: []
         };
         
         let currentLoan = {};
         let selectedComputers = [];
+        let selectedLoanForReturn = null;
+        
+        // Initialize Configuration Data (fallback if config.js not loaded)
+        const DEFAULT_CONFIG = {
+            teachers: [
+                "יוסי"
+            ],
+            classes: ["א'"],
+            timeSlots: ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"],
+            computerCountOptions: [
+                { value: 1, label: "1 מחשב" },
+                { value: 2, label: "2 מחשבים" },
+                { value: 3, label: "3 מחשבים" },
+                { value: 4, label: "4 מחשבים" },
+                { value: 5, label: "5 מחשבים" },
+                { value: 6, label: "6 מחשבים" },
+                { value: 7, label: "7 מחשבים" },
+                { value: 8, label: "8 מחשבים" },
+                { value: 9, label: "9 מחשבים" },
+                { value: 10, label: "10 מחשבים" },
+                { value: 11, label: "11 מחשבים" },
+                { value: 12, label: "12 מחשבים" },
+                { value: 13, label: "13 מחשבים" },
+                { value: 14, label: "14 מחשבים" },
+                { value: 15, label: "15 מחשבים" },
+                { value: 16, label: "16 מחשבים" },
+                { value: 17, label: "17 מחשבים" },
+                { value: 18, label: "18 מחשבים" },
+                { value: 19, label: "19 מחשבים" },
+                { value: 20, label: "20 מחשבים" },
+                { value: 21, label: "21 מחשבים" },
+                { value: 22, label: "22 מחשבים" },
+                { value: 23, label: "23 מחשבים" },
+                { value: 24, label: "24 מחשבים" },
+                { value: 25, label: "25 מחשבים" },
+                { value: 36, label: "כל המחשבים" }
+            ],
+            carts: {
+                cart1: { name: "עגלה #1", computerPrefix: "PC1", computerCount: 24 },
+                cart2: { name: "עגלה #2", computerPrefix: "PC2", computerCount: 12 }
+            }
+        };
+
+        // Get config (use external config if available, otherwise default)
+        const config = typeof CONFIG !== 'undefined' ? CONFIG : DEFAULT_CONFIG;
         
         // Generate Computer List
         function generateComputerList(prefix, count) {
@@ -675,6 +645,91 @@
                 computers.push(`${prefix}-${i.toString().padStart(3, '0')}`);
             }
             return computers;
+        }
+
+        // Initialize Cart Data
+        function initializeCartData() {
+            const cartData = {};
+            
+            Object.keys(config.carts).forEach(cartId => {
+                const cart = config.carts[cartId];
+                cartData[cartId] = {
+                    name: cart.name,
+                    description: cart.description || '',
+                    computers: generateComputerList(cart.computerPrefix, cart.computerCount)
+                };
+            });
+            
+            return cartData;
+        }
+        
+        // Populate Select Options
+        function populateSelectOptions() {
+            // Teachers
+            const teacherSelects = ['teacherName', 'returnTeacher'];
+            teacherSelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '<option value="">בחרי מורה...</option>';
+                    config.teachers.forEach(teacher => {
+                        const option = document.createElement('option');
+                        option.value = teacher;
+                        option.textContent = teacher;
+                        select.appendChild(option);
+                    });
+                }
+            });
+
+            // Classes
+            const classSelect = document.getElementById('teacherClass');
+            if (classSelect) {
+                classSelect.innerHTML = '<option value="">בחרי כיתה...</option>';
+                config.classes.forEach(className => {
+                    const option = document.createElement('option');
+                    option.value = className;
+                    option.textContent = className;
+                    classSelect.appendChild(option);
+                });
+            }
+
+            // Time slots
+            const timeSelects = ['loanTime', 'returnTime'];
+            timeSelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '<option value="">בחרי שעה...</option>';
+                    config.timeSlots.forEach(time => {
+                        const option = document.createElement('option');
+                        option.value = time;
+                        option.textContent = time;
+                        select.appendChild(option);
+                    });
+                }
+            });
+
+            // Computer count
+            const computerCountSelect = document.getElementById('computerCount');
+            if (computerCountSelect) {
+                computerCountSelect.innerHTML = '<option value="">בחרי כמות...</option>';
+                config.computerCountOptions.forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option.value;
+                    optionElement.textContent = option.label;
+                    computerCountSelect.appendChild(optionElement);
+                });
+            }
+
+            // Carts
+            const cartSelect = document.getElementById('cartSelect');
+            if (cartSelect) {
+                cartSelect.innerHTML = '<option value="">בחרי עגלה...</option>';
+                Object.keys(config.carts).forEach(cartId => {
+                    const option = document.createElement('option');
+                    option.value = cartId;
+                    option.textContent = config.carts[cartId].name;
+                    cartSelect.appendChild(option);
+                });
+            }
         }
         
         // Initialize Firebase
@@ -712,10 +767,10 @@
         function updateConnectionStatus(connected) {
             const statusElement = document.getElementById('connectionStatus');
             if (connected) {
-                statusElement.textContent = '🟢 מחובר לענן';
+                statusElement.textContent = '🟢 מחוברת לענן';
                 statusElement.className = 'connection-status connected';
             } else {
-                statusElement.textContent = '🔴 מנותק';
+                statusElement.textContent = '🔴 מנותקת';
                 statusElement.className = 'connection-status disconnected';
             }
         }
@@ -728,15 +783,24 @@
                 .then((snapshot) => {
                     if (snapshot.exists()) {
                         const data = snapshot.val();
-                        if (data.carts) systemData.carts = data.carts;
+                        if (data.carts) {
+                            systemData.carts = data.carts;
+                        } else {
+                            systemData.carts = initializeCartData();
+                        }
                         if (data.loans) {
                             systemData.loans = Object.values(data.loans);
                         }
                         console.log('✅ Data loaded from Firebase');
+                    } else {
+                        // Initialize with default cart data if no data exists
+                        systemData.carts = initializeCartData();
+                        saveToFirebase();
                     }
                 })
                 .catch((error) => {
                     console.error('❌ Error loading data:', error);
+                    systemData.carts = initializeCartData();
                 });
         }
         
@@ -751,6 +815,16 @@
                 if (existingIndex === -1) {
                     systemData.loans.push(loan);
                     console.log('📥 New loan received from Firebase');
+                }
+            });
+
+            // Listen for loan updates (returns)
+            database.ref('loans').on('child_changed', (snapshot) => {
+                const updatedLoan = snapshot.val();
+                const existingIndex = systemData.loans.findIndex(l => l.id === updatedLoan.id);
+                if (existingIndex !== -1) {
+                    systemData.loans[existingIndex] = updatedLoan;
+                    console.log('📥 Loan updated from Firebase');
                 }
             });
         }
@@ -786,11 +860,6 @@
             document.getElementById(screenId).classList.add('active');
         }
         
-        // Show GitHub Instructions
-        function showGitHubInstructions() {
-            showScreen('githubScreen');
-        }
-        
         // Show Error Message
         function showError(message) {
             const existingErrors = document.querySelectorAll('.error-message');
@@ -812,7 +881,16 @@
         function getOccupiedComputers(cartId, date) {
             return systemData.loans
                 .filter(loan => loan.cart === cartId && loan.loanDate === date && !loan.returned)
-                .flatMap(loan => loan.computers);
+                .flatMap(loan => loan.computers || []);
+        }
+
+        // Get Active Loans for Teacher
+        function getActiveLoansForTeacher(teacherName) {
+            return systemData.loans.filter(loan => 
+                loan.teacherName === teacherName && 
+                !loan.returned && 
+                loan.type !== 'return'
+            );
         }
         
         // Update Available Computers
@@ -833,26 +911,28 @@
             const cartData = systemData.carts[selectedCart];
             const occupiedComputers = getOccupiedComputers(selectedCart, currentLoan.loanDate);
             
-            cartData.computers.forEach(computer => {
-                const isOccupied = occupiedComputers.includes(computer);
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = computer;
-                checkbox.className = 'computer-checkbox';
-                checkbox.value = computer;
-                checkbox.disabled = isOccupied;
-                
-                const label = document.createElement('label');
-                label.htmlFor = computer;
-                label.className = 'computer-label';
-                label.textContent = computer;
-                
-                computerGrid.appendChild(checkbox);
-                computerGrid.appendChild(label);
-                
-                checkbox.addEventListener('change', updateSelectedComputers);
-            });
+            if (cartData && cartData.computers) {
+                cartData.computers.forEach(computer => {
+                    const isOccupied = occupiedComputers.includes(computer);
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = computer;
+                    checkbox.className = 'computer-checkbox';
+                    checkbox.value = computer;
+                    checkbox.disabled = isOccupied;
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = computer;
+                    label.className = 'computer-label';
+                    label.textContent = computer;
+                    
+                    computerGrid.appendChild(checkbox);
+                    computerGrid.appendChild(label);
+                    
+                    checkbox.addEventListener('change', updateSelectedComputers);
+                });
+            }
             
             updateSelectedCount();
         }
@@ -882,6 +962,69 @@
             
             submitBtn.disabled = selectedCount !== requiredCount;
         }
+
+        // Load Active Loans for Return
+        function loadActiveLoansForReturn(teacherName) {
+            const activeLoans = getActiveLoansForTeacher(teacherName);
+            const loansList = document.getElementById('activeLoansList');
+            
+            if (activeLoans.length === 0) {
+                loansList.innerHTML = '<div class="no-loans">אין השאלות פעילות למורה זו</div>';
+                return;
+            }
+            
+            loansList.innerHTML = '';
+            
+            activeLoans.forEach(loan => {
+                const loanItem = document.createElement('div');
+                loanItem.className = 'loan-item';
+                loanItem.setAttribute('data-loan-id', loan.id);
+                
+                const loanHeader = document.createElement('div');
+                loanHeader.className = 'loan-header';
+                loanHeader.textContent = `השאלה מתאריך ${loan.loanDate} - ${loan.loanTime}`;
+                
+                const loanDetails = document.createElement('div');
+                loanDetails.className = 'loan-details';
+                loanDetails.textContent = `כיתה ${loan.teacherClass} • ${loan.computers ? loan.computers.length : 0} מחשבים • ${systemData.carts[loan.cart]?.name || loan.cart}`;
+                
+                loanItem.appendChild(loanHeader);
+                loanItem.appendChild(loanDetails);
+                
+                loanItem.addEventListener('click', () => selectLoanForReturn(loan, loanItem));
+                
+                loansList.appendChild(loanItem);
+            });
+        }
+
+        // Select Loan for Return
+        function selectLoanForReturn(loan, element) {
+            // Remove previous selection
+            document.querySelectorAll('.loan-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Select current item
+            element.classList.add('selected');
+            selectedLoanForReturn = loan;
+            
+            // Show return details sections
+            document.getElementById('returnDetailsSection').style.display = 'block';
+            document.getElementById('returnTimeSection').style.display = 'block';
+            document.getElementById('returnNotesSection').style.display = 'block';
+            
+            // Enable submit button
+            updateReturnSubmitButton();
+        }
+
+        // Update Return Submit Button
+        function updateReturnSubmitButton() {
+            const submitBtn = document.getElementById('submitReturn');
+            const returnDate = document.getElementById('returnDate').value;
+            const returnTime = document.getElementById('returnTime').value;
+            
+            submitBtn.disabled = !selectedLoanForReturn || !returnDate || !returnTime;
+        }
         
         // Navigation Functions
         function goToDateScreen() {
@@ -889,7 +1032,7 @@
             const teacherClass = document.getElementById('teacherClass').value;
             
             if (!teacherName || !teacherClass) {
-                showError('אנא בחר מורה וכיתה');
+                showError('אנא בחרי מורה וכיתה');
                 return;
             }
             
@@ -905,7 +1048,7 @@
             const computerCount = document.getElementById('computerCount').value;
             
             if (!loanDate || !loanTime || !computerCount) {
-                showError('אנא מלא את כל השדות');
+                showError('אנא מלאי את כל השדות');
                 return;
             }
             
@@ -915,13 +1058,26 @@
             
             showScreen('computerScreen');
         }
+
+        function goToReturnLoanSelect() {
+            const teacherName = document.getElementById('returnTeacher').value;
+            
+            if (!teacherName) {
+                showError('אנא בחרי מורה');
+                return;
+            }
+            
+            document.getElementById('selectedTeacherName').textContent = teacherName;
+            loadActiveLoansForReturn(teacherName);
+            showScreen('returnLoanSelectScreen');
+        }
         
         // Submit Loan
         function submitLoan() {
             const selectedCart = document.getElementById('cartSelect').value;
             
             if (!selectedCart || selectedComputers.length !== currentLoan.computerCount) {
-                showError('אנא בחר עגלה ומספר המחשבים הנדרש');
+                showError('אנא בחרי עגלה ומספר המחשבים הנדרש');
                 return;
             }
             
@@ -948,27 +1104,29 @@
             const returnTime = document.getElementById('returnTime').value;
             const returnNotes = document.getElementById('returnNotes').value;
             
-            if (!returnDate || !returnTime) {
-                showError('אנא מלא את כל השדות הנדרשים');
+            if (!selectedLoanForReturn || !returnDate || !returnTime) {
+                showError('אנא בחרי השאלה ומלאי את כל השדות הנדרשים');
                 return;
             }
             
-            // For demo purposes, we'll create a simple return entry
-            const returnEntry = {
-                id: Date.now(),
-                returnDate: returnDate,
-                returnTime: returnTime,
-                returnNotes: returnNotes,
-                type: 'return',
-                createdAt: new Date().toISOString()
-            };
+            // Update the loan as returned
+            const loanIndex = systemData.loans.findIndex(l => l.id === selectedLoanForReturn.id);
+            if (loanIndex !== -1) {
+                systemData.loans[loanIndex].returned = true;
+                systemData.loans[loanIndex].returnDate = returnDate;
+                systemData.loans[loanIndex].returnTime = returnTime;
+                systemData.loans[loanIndex].returnNotes = returnNotes;
+                systemData.loans[loanIndex].returnedAt = new Date().toISOString();
+            }
             
-            systemData.loans.push(returnEntry);
             saveToFirebase();
             
             document.getElementById('successTitle').textContent = 'החזרה אושרה!';
-            document.getElementById('successMessage').textContent = 'המחשבים החזרו בהצלחה למערכת.';
+            document.getElementById('successMessage').textContent = `המחשבים של ${selectedLoanForReturn.teacherName} הוחזרו בהצלחה למערכת.`;
             showScreen('successScreen');
+            
+            // Reset
+            selectedLoanForReturn = null;
         }
         
         // Event Listeners
@@ -981,10 +1139,11 @@
             });
             
             document.getElementById('returnBtn').addEventListener('click', () => {
-                showScreen('returnScreen');
+                showScreen('returnTeacherScreen');
+                selectedLoanForReturn = null;
             });
             
-            // Navigation buttons
+            // Loan navigation buttons
             document.getElementById('backToMain1').addEventListener('click', () => showScreen('mainScreen'));
             document.getElementById('nextToDate').addEventListener('click', goToDateScreen);
             document.getElementById('backToTeacher').addEventListener('click', () => showScreen('teacherScreen'));
@@ -992,18 +1151,31 @@
             document.getElementById('backToDate').addEventListener('click', () => showScreen('dateScreen'));
             document.getElementById('submitLoan').addEventListener('click', submitLoan);
             
-            document.getElementById('backToMain2').addEventListener('click', () => showScreen('mainScreen'));
+            // Return navigation buttons
+            document.getElementById('backToMainFromReturn1').addEventListener('click', () => showScreen('mainScreen'));
+            document.getElementById('nextToReturnLoanSelect').addEventListener('click', goToReturnLoanSelect);
+            document.getElementById('backToReturnTeacher').addEventListener('click', () => showScreen('returnTeacherScreen'));
             document.getElementById('submitReturn').addEventListener('click', submitReturn);
             
             document.getElementById('backToMainSuccess').addEventListener('click', () => showScreen('mainScreen'));
             
             // Cart selection
             document.getElementById('cartSelect').addEventListener('change', updateAvailableComputers);
+            
+            // Return form change events
+            document.getElementById('returnDate').addEventListener('change', updateReturnSubmitButton);
+            document.getElementById('returnTime').addEventListener('change', updateReturnSubmitButton);
         }
         
         // Initialize System
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔄 מאתחל מערכת...');
+            console.log('🔄 מאתחלת מערכת...');
+            
+            // Populate select options from config
+            populateSelectOptions();
+            
+            // Initialize cart data
+            systemData.carts = initializeCartData();
             
             // Set default dates
             const tomorrow = new Date();
