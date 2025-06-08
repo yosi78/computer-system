@@ -1306,82 +1306,52 @@
             container.innerHTML = html;
         }
         
-        function resetSystem() {
-            // בקשת אישור כפול
-            const firstConfirm = confirm('⚠️ האם אתה בטוח שברצונך לאפס את המערכת?\n\nפעולה זו תמחק את כל ההשאלות ותאפס את בסיס הנתונים לחלוטין.');
+        function markAllAsReturned() {
+            // בדיקה אם יש השאלות פעילות
+            const activeLoans = systemData.loans.filter(loan => !loan.returned);
             
-            if (!firstConfirm) return;
-            
-            const secondConfirm = confirm('🚨 אישור נוסף!\n\nזוהי פעולה בלתי הפיכה!\nכל הנתונים יימחקו ותתחיל מחדש.\n\nהאם להמשיך?');
-            
-            if (!secondConfirm) return;
-            
-            try {
-                console.log('🔄 מתחיל איפוס מערכת...');
-                
-                // מחק את כל ההשאלות
-                systemData.loans = [];
-                
-                // אתחל מחדש את נתוני העגלות
-                systemData.carts = initializeCartData();
-                
-                // שמור בענן - מחק הכל ושמור נתונים נקיים
-                if (database && isConnected) {
-                    database.ref().set({
-                        carts: systemData.carts,
-                        loans: {}
-                    }).then(() => {
-                        console.log('✅ בסיס הנתונים נוקה בהצלחה');
-                        
-                        // עדכן את מסך הניהול
-                        updateManagementData();
-                        
-                        // הודעת הצלחה
-                        alert('✅ המערכת אופסה בהצלחה!\n\nבסיס הנתונים נוקה לחלוטין.\nכל המחשבים זמינים כעת.');
-                        
-                    }).catch((error) => {
-                        console.error('❌ שגיאה בשמירה:', error);
-                        alert('❌ שגיאה בשמירת האיפוס. נסה שוב.');
-                    });
-                } else {
-                    // אם אין חיבור לענן - לפחות נקה מקומית
-                    updateManagementData();
-                    alert('⚠️ אין חיבור לענן!\nהמערכת אופסה מקומית בלבד.\nהנתונים יחזרו אם תרענן את הדף.');
-                }
-                
-            } catch (error) {
-                console.error('❌ שגיאה באיפוס המערכת:', error);
-                alert('❌ שגיאה באיפוס המערכת. נסה שוב.');
-            }
-        }
-        
-        // פונקציה נוספת לניקוי כפוי של הענן
-        function forceCleanDatabase() {
-            if (!database || !isConnected) {
-                alert('❌ אין חיבור לענן!');
+            if (activeLoans.length === 0) {
+                alert('ℹ️ אין השאלות פעילות לסימון');
                 return;
             }
             
-            const confirm = window.confirm('🚨 ניקוי כפוי של בסיס הנתונים!\n\nזה ימחק הכל מהענן ויתחיל מאפס.\nהאם להמשיך?');
+            // בקשת אישור
+            const confirm = window.confirm(`⚠️ האם לסמן את כל ${activeLoans.length} ההשאלות הפעילות כהוחזרו?\n\nפעולה זו תשחרר את כל המחשבים.`);
             
-            if (confirm) {
-                database.ref().remove().then(() => {
-                    console.log('🗑️ בסיס הנתונים נמחק לחלוטין');
-                    
-                    // אתחל מחדש
-                    systemData.carts = initializeCartData();
-                    systemData.loans = [];
-                    
-                    // שמור נתונים נקיים
-                    saveToFirebase();
-                    
-                    alert('✅ בסיס הנתונים נוקה לחלוטין מהענן!');
-                    updateManagementData();
-                    
-                }).catch((error) => {
-                    console.error('❌ שגיאה במחיקה:', error);
-                    alert('❌ שגיאה במחיקת הענן.');
+            if (!confirm) return;
+            
+            try {
+                const currentDate = new Date().toISOString().split('T')[0];
+                const currentTime = new Date().toTimeString().split(' ')[0].substring(0, 5);
+                
+                let returnedCount = 0;
+                
+                // סמן את כל ההשאלות הפעילות כהוחזרו
+                systemData.loans.forEach(loan => {
+                    if (!loan.returned) {
+                        loan.returned = true;
+                        loan.returnDate = currentDate;
+                        loan.returnTime = currentTime;
+                        loan.returnNotes = 'סימון אוטומטי - כל המחשבים הוחזרו';
+                        loan.returnedAt = new Date().toISOString();
+                        returnedCount++;
+                    }
                 });
+                
+                // שמור בענן
+                saveToFirebase();
+                
+                // עדכן את מסך הניהול
+                updateManagementData();
+                
+                // הודעת הצלחה
+                alert(`✅ בוצע בהצלחה!\n\n${returnedCount} השאלות סומנו כהוחזרו.\nכל המחשבים זמינים כעת.`);
+                
+                console.log(`✅ סומנו כהוחזרו: ${returnedCount} השאלות`);
+                
+            } catch (error) {
+                console.error('❌ שגיאה בסימון השאלות:', error);
+                alert('❌ שגיאה בסימון ההשאלות. נסה שוב.');
             }
         }
 
@@ -1534,8 +1504,7 @@
             document.getElementById('refreshManagement').addEventListener('click', updateManagementData);
             
             // Reset system button
-            document.getElementById('resetSystemBtn').addEventListener('click', resetSystem);
-            document.getElementById('forceCleanBtn').addEventListener('click', forceCleanDatabase);
+            document.getElementById('markAllReturnedBtn').addEventListener('click', markAllAsReturned);
             
             // Password screen - Enter key support
             document.getElementById('adminPassword').addEventListener('keypress', function(e) {
