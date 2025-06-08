@@ -391,6 +391,9 @@
                     <button class="option-btn return" id="returnBtn">
                         ↩️ החזרת מחשבים
                     </button>
+                    <button class="option-btn" id="managementBtn" style="background: linear-gradient(45deg, #9C27B0, #7B1FA2);">
+                        ⚙️ ניהול
+                    </button>
                 </div>
             </div>
             
@@ -487,6 +490,63 @@
                 <div class="button-group">
                     <button class="btn btn-secondary" id="backToDate">חזרה</button>
                     <button class="btn btn-primary" id="submitLoan" disabled>שלחי</button>
+                </div>
+            </div>
+            
+            <!-- מסך סיסמת ניהול -->
+            <div id="passwordScreen" class="screen">
+                <h2 class="screen-title">🔐 הזדהות מנהלת</h2>
+                
+                <div class="form-group">
+                    <label for="adminPassword">הכניסי סיסמת ניהול:</label>
+                    <input type="password" id="adminPassword" placeholder="סיסמה...">
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" id="backToMainFromPassword">חזרה</button>
+                    <button class="btn btn-primary" id="submitPassword">כניסה</button>
+                </div>
+            </div>
+            
+            <!-- מסך ניהול -->
+            <div id="managementScreen" class="screen">
+                <h2 class="screen-title">⚙️ מסך ניהול</h2>
+                
+                <!-- סטטיסטיקות כלליות -->
+                <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: #1976d2; margin-bottom: 10px;">📊 סטטיסטיקות כלליות</h3>
+                    <div id="generalStats">
+                        <div>📦 סה"כ מחשבים במערכת: <strong id="totalComputers">36</strong></div>
+                        <div>🔄 מחשבים מושאלים כרגע: <strong id="loanedComputers">0</strong></div>
+                        <div>✅ מחשבים זמינים: <strong id="availableComputers">36</strong></div>
+                    </div>
+                </div>
+                
+                <!-- השאלות נוכחיות -->
+                <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: #f57c00; margin-bottom: 10px;">🔄 השאלות פעילות כרגע</h3>
+                    <div id="currentLoans">
+                        <div style="text-align: center; color: #999; font-style: italic;">אין השאלות פעילות</div>
+                    </div>
+                </div>
+                
+                <!-- השאלות עתידיות -->
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: #2e7d32; margin-bottom: 10px;">📅 השאלות עתידיות</h3>
+                    <div id="futureLoans">
+                        <div style="text-align: center; color: #999; font-style: italic;">אין השאלות מתוכננות</div>
+                    </div>
+                </div>
+                
+                <!-- פירוט לפי עגלות -->
+                <div style="background: #f3e5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: #7b1fa2; margin-bottom: 10px;">🛒 מצב עגלות</h3>
+                    <div id="cartStatus"></div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" id="backToMainFromManagement">חזרה לתפריט הראשי</button>
+                    <button class="btn btn-primary" id="refreshManagement">🔄 רענון נתונים</button>
                 </div>
             </div>
             
@@ -1080,6 +1140,158 @@
             submitBtn.disabled = !selectedLoanForReturn || !returnDate || !returnTime;
         }
         
+        // Management Functions
+        function showPasswordScreen() {
+            document.getElementById('adminPassword').value = '';
+            showScreen('passwordScreen');
+        }
+        
+        function checkPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === 'n0987') {
+                showManagementScreen();
+            } else {
+                showError('סיסמה שגויה! נסי שוב.');
+                document.getElementById('adminPassword').value = '';
+            }
+        }
+        
+        function showManagementScreen() {
+            updateManagementData();
+            showScreen('managementScreen');
+        }
+        
+        function updateManagementData() {
+            updateGeneralStats();
+            updateCurrentLoans();
+            updateFutureLoans();
+            updateCartStatus();
+        }
+        
+        function updateGeneralStats() {
+            const totalComputers = Object.values(systemData.carts).reduce((sum, cart) => sum + cart.computers.length, 0);
+            const currentDate = new Date().toISOString().split('T')[0];
+            
+            const loanedToday = systemData.loans.filter(loan => 
+                loan.loanDate <= currentDate && !loan.returned
+            );
+            
+            const loanedComputersCount = loanedToday.reduce((sum, loan) => sum + (loan.computers ? loan.computers.length : 0), 0);
+            const availableComputers = totalComputers - loanedComputersCount;
+            
+            document.getElementById('totalComputers').textContent = totalComputers;
+            document.getElementById('loanedComputers').textContent = loanedComputersCount;
+            document.getElementById('availableComputers').textContent = availableComputers;
+        }
+        
+        function updateCurrentLoans() {
+            const currentDate = new Date().toISOString().split('T')[0];
+            const currentLoans = systemData.loans.filter(loan => 
+                loan.loanDate <= currentDate && !loan.returned && loan.type !== 'return'
+            );
+            
+            const container = document.getElementById('currentLoans');
+            
+            if (currentLoans.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #999; font-style: italic;">אין השאלות פעילות כרגע</div>';
+                return;
+            }
+            
+            let html = '';
+            currentLoans.forEach(loan => {
+                const cartName = systemData.carts[loan.cart]?.name || loan.cart;
+                html += `
+                    <div style="background: white; padding: 10px; margin: 5px 0; border-radius: 5px; border-right: 4px solid #ff9800;">
+                        <div style="font-weight: bold; color: #333;">👩‍🏫 ${loan.teacherName} - כיתה ${loan.teacherClass}</div>
+                        <div style="font-size: 0.9em; color: #666;">
+                            📅 ${loan.loanDate} • ⏰ ${loan.loanTime} • 🖥️ ${loan.computers ? loan.computers.length : 0} מחשבים • 🛒 ${cartName}
+                        </div>
+                        ${loan.computers && loan.computers.length > 0 ? `
+                            <div style="font-size: 0.8em; color: #999; margin-top: 5px;">
+                                מחשבים: ${loan.computers.slice(0, 5).join(', ')}${loan.computers.length > 5 ? ` ו-${loan.computers.length - 5} נוספים...` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function updateFutureLoans() {
+            const currentDate = new Date().toISOString().split('T')[0];
+            const futureLoans = systemData.loans.filter(loan => 
+                loan.loanDate > currentDate && loan.type !== 'return'
+            ).sort((a, b) => new Date(a.loanDate) - new Date(b.loanDate));
+            
+            const container = document.getElementById('futureLoans');
+            
+            if (futureLoans.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #999; font-style: italic;">אין השאלות מתוכננות</div>';
+                return;
+            }
+            
+            let html = '';
+            futureLoans.forEach(loan => {
+                const cartName = systemData.carts[loan.cart]?.name || loan.cart;
+                const loanDate = new Date(loan.loanDate);
+                const today = new Date();
+                const daysUntil = Math.ceil((loanDate - today) / (1000 * 60 * 60 * 24));
+                
+                html += `
+                    <div style="background: white; padding: 10px; margin: 5px 0; border-radius: 5px; border-right: 4px solid #4caf50;">
+                        <div style="font-weight: bold; color: #333;">👩‍🏫 ${loan.teacherName} - כיתה ${loan.teacherClass}</div>
+                        <div style="font-size: 0.9em; color: #666;">
+                            📅 ${loan.loanDate} (בעוד ${daysUntil} ימים) • ⏰ ${loan.loanTime} • 🖥️ ${loan.computerCount} מחשבים • 🛒 ${cartName}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function updateCartStatus() {
+            const container = document.getElementById('cartStatus');
+            const currentDate = new Date().toISOString().split('T')[0];
+            
+            let html = '';
+            Object.keys(systemData.carts).forEach(cartId => {
+                const cart = systemData.carts[cartId];
+                const cartLoans = systemData.loans.filter(loan => 
+                    loan.cart === cartId && loan.loanDate <= currentDate && !loan.returned
+                );
+                
+                const loanedComputers = cartLoans.reduce((sum, loan) => sum + (loan.computers ? loan.computers.length : 0), 0);
+                const availableComputers = cart.computers.length - loanedComputers;
+                const usagePercentage = Math.round((loanedComputers / cart.computers.length) * 100);
+                
+                html += `
+                    <div style="background: white; padding: 12px; margin: 8px 0; border-radius: 5px; border-right: 4px solid #9c27b0;">
+                        <div style="font-weight: bold; color: #333; margin-bottom: 8px;">🛒 ${cart.name}</div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9em;">
+                            <div>📦 סה"כ: ${cart.computers.length}</div>
+                            <div style="color: #f44336;">🔄 מושאלים: ${loanedComputers}</div>
+                            <div style="color: #4caf50;">✅ זמינים: ${availableComputers}</div>
+                        </div>
+                        <div style="background: #f5f5f5; height: 8px; border-radius: 4px; margin-top: 8px; overflow: hidden;">
+                            <div style="background: ${usagePercentage > 80 ? '#f44336' : usagePercentage > 50 ? '#ff9800' : '#4caf50'}; height: 100%; width: ${usagePercentage}%; transition: width 0.3s;"></div>
+                        </div>
+                        <div style="font-size: 0.8em; color: #666; margin-top: 4px;">${usagePercentage}% בשימוש</div>
+                        
+                        ${cartLoans.length > 0 ? `
+                            <div style="margin-top: 10px; font-size: 0.8em;">
+                                <strong>מושאל כרגע ל:</strong>
+                                ${cartLoans.map(loan => `<div style="color: #666;">• ${loan.teacherName} (${loan.computers ? loan.computers.length : 0} מחשבים)</div>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
         // Navigation Functions
         function goToDateScreen() {
             const teacherName = document.getElementById('teacherName').value;
@@ -1196,6 +1408,8 @@
                 showScreen('returnTeacherScreen');
                 selectedLoanForReturn = null;
             });
+            
+            document.getElementById('managementBtn').addEventListener('click', showPasswordScreen);
             
             // Loan navigation buttons
             document.getElementById('backToMain1').addEventListener('click', () => showScreen('mainScreen'));
