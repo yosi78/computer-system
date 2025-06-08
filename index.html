@@ -421,6 +421,20 @@
                     </select>
                 </div>
                 
+                <!-- פעולות ניהול -->
+                <div style="background: #ffebee; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: #d32f2f; margin-bottom: 10px;">⚠️ פעולות ניהול</h3>
+                    <div style="background: white; padding: 12px; border-radius: 5px; margin-bottom: 10px;">
+                        <p style="color: #666; margin-bottom: 10px;">
+                            <strong>איפוס מערכת:</strong> פעולה זו תסמן את כל המחשבים כהוחזרו ותנקה את בסיס הנתונים.
+                            השתמש בזה בסוף כל יום/שבוע לאיפוס המערכת.
+                        </p>
+                        <button class="btn" id="resetSystemBtn" style="background: #d32f2f; color: white; width: 100%; padding: 15px; font-size: 1.1em; font-weight: bold;">
+                            🗑️ איפוס מערכת - כל המחשבים הוחזרו
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="button-group">
                     <button class="btn btn-secondary" id="backToMain1">חזרה</button>
                     <button class="btn btn-primary" id="nextToDate">הבאה</button>
@@ -495,10 +509,10 @@
             
             <!-- מסך סיסמת ניהול -->
             <div id="passwordScreen" class="screen">
-                <h2 class="screen-title">🔐 הזדהות מנהלת</h2>
+                <h2 class="screen-title">🔐 הזדהות מנהל</h2>
                 
                 <div class="form-group">
-                    <label for="adminPassword">הכניסי סיסמת ניהול:</label>
+                    <label for="adminPassword">הכנס סיסמת ניהול:</label>
                     <input type="password" id="adminPassword" placeholder="סיסמה...">
                 </div>
                 
@@ -1291,6 +1305,50 @@
             
             container.innerHTML = html;
         }
+        
+        function resetSystem() {
+            // בקשת אישור כפול
+            const firstConfirm = confirm('⚠️ האם את בטוחה שברצונך לאפס את המערכת?\n\nפעולה זו תסמן את כל המחשבים כהוחזרו ותמחק את כל ההשאלות הפעילות.');
+            
+            if (!firstConfirm) return;
+            
+            const secondConfirm = confirm('🚨 אישור נוסף!\n\nזוהי פעולה בלתי הפיכה!\nכל הנתונים על השאלות פעילות יימחקו.\n\nהאם להמשיך?');
+            
+            if (!secondConfirm) return;
+            
+            try {
+                // סמן את כל ההשאלות הפעילות כהוחזרו
+                const currentDate = new Date().toISOString().split('T')[0];
+                const currentTime = new Date().toTimeString().split(' ')[0].substring(0, 5);
+                
+                let resetCount = 0;
+                systemData.loans.forEach(loan => {
+                    if (!loan.returned && loan.type !== 'return') {
+                        loan.returned = true;
+                        loan.returnDate = currentDate;
+                        loan.returnTime = currentTime;
+                        loan.returnNotes = 'איפוס מערכת אוטומטי';
+                        loan.returnedAt = new Date().toISOString();
+                        resetCount++;
+                    }
+                });
+                
+                // שמור בענן
+                saveToFirebase();
+                
+                // עדכן את מסך הניהול
+                updateManagementData();
+                
+                // הודעת הצלחה
+                alert(`✅ המערכת אופסה בהצלחה!\n\n${resetCount} השאלות סומנו כהוחזרו.\nכל המחשבים זמינים כעת.`);
+                
+                console.log(`🔄 מערכת אופסה: ${resetCount} השאלות סומנו כהוחזרו`);
+                
+            } catch (error) {
+                console.error('❌ שגיאה באיפוס המערכת:', error);
+                alert('❌ שגיאה באיפוס המערכת. נסי שוב.');
+            }
+        }
 
         // Navigation Functions
         function goToDateScreen() {
@@ -1433,6 +1491,22 @@
             // Return form change events
             document.getElementById('returnDate').addEventListener('change', updateReturnSubmitButton);
             document.getElementById('returnTime').addEventListener('change', updateReturnSubmitButton);
+            
+            // Management screen events
+            document.getElementById('backToMainFromPassword').addEventListener('click', () => showScreen('mainScreen'));
+            document.getElementById('submitPassword').addEventListener('click', checkPassword);
+            document.getElementById('backToMainFromManagement').addEventListener('click', () => showScreen('mainScreen'));
+            document.getElementById('refreshManagement').addEventListener('click', updateManagementData);
+            
+            // Reset system button
+            document.getElementById('resetSystemBtn').addEventListener('click', resetSystem);
+            
+            // Password screen - Enter key support
+            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
         }
         
         // Initialize System
