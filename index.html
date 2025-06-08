@@ -621,14 +621,44 @@
             }
         };
 
-        // בדיקה אם config.js נטען בהצלחה
-        const config = typeof CONFIG !== 'undefined' ? CONFIG : DEFAULT_CONFIG;
+        // בדיקה מתקדמת אם config.js נטען
+        let config;
+        let configLoadedSuccessfully = false;
         
-        // הודעת בקרה
-        if (typeof CONFIG === 'undefined') {
-            console.warn('⚠️ קובץ config.js לא נטען! משתמשת בהגדרות ברירת מחדל');
+        // בדיקה ראשונה: האם CONFIG קיים?
+        if (typeof CONFIG !== 'undefined') {
+            console.log('✅ CONFIG נמצא - בודק תוכן...');
+            
+            // בדיקה שנייה: האם יש בו נתונים תקינים?
+            if (CONFIG.teachers && CONFIG.teachers.length > 10) {
+                console.log(`✅ נמצאו ${CONFIG.teachers.length} מורות - קובץ חיצוני נטען!`);
+                config = CONFIG;
+                configLoadedSuccessfully = true;
+            } else {
+                console.warn('⚠️ CONFIG קיים אבל חסרים נתונים');
+                config = DEFAULT_CONFIG;
+            }
         } else {
-            console.log('✅ קובץ config.js נטען בהצלחה');
+            console.warn('⚠️ CONFIG לא נמצא - משתמש בברירת מחדל');
+            config = DEFAULT_CONFIG;
+        }
+        
+        // בדיקה שלישית: האם window.CONFIG קיים?
+        if (typeof window !== 'undefined' && window.CONFIG) {
+            console.log('🌐 נמצא CONFIG בחלון הגלובלי');
+            config = window.CONFIG;
+            configLoadedSuccessfully = true;
+        }
+        
+        // הודעת סטטוס סופית
+        if (configLoadedSuccessfully) {
+            console.log('🎉 SUCCESS: נתוני הקובץ החיצוני נטענו בהצלחה!');
+            console.log('📋 מורות בקובץ החיצוני:', config.teachers);
+        } else {
+            console.error('❌ PROBLEM: הקובץ החיצוני לא נטען - בדקי:');
+            console.error('   1. config.js באותה תיקייה כמו index.html');
+            console.error('   2. אין שגיאות JavaScript בקונסול');
+            console.error('   3. הדף נפתח דרך שרת (לא file://)');
         }
         
         // Generate Computer List

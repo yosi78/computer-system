@@ -100,7 +100,25 @@ const CONFIG = {
     ]
 };
 
-// פונקציה ליצירת רשימת מחשבים
+// בדיקת תקינות הנתונים
+function validateConfig() {
+    console.log('🔍 בודק תקינות נתוני config...');
+    
+    if (!CONFIG.teachers || CONFIG.teachers.length === 0) {
+        console.error('❌ שגיאה: אין מורות מוגדרות!');
+        return false;
+    }
+    
+    if (!CONFIG.carts || Object.keys(CONFIG.carts).length === 0) {
+        console.error('❌ שגיאה: אין עגלות מוגדרות!');
+        return false;
+    }
+    
+    console.log(`✅ נמצאו ${CONFIG.teachers.length} מורות ו-${Object.keys(CONFIG.carts).length} עגלות`);
+    return true;
+}
+
+// 🔧 פונקציות עזר - אל תשני את החלק הזה
 function generateComputerList(prefix, count) {
     const computers = [];
     for (let i = 1; i <= count; i++) {
@@ -109,23 +127,39 @@ function generateComputerList(prefix, count) {
     return computers;
 }
 
-// יצירת מבנה העגלות עם המחשבים
 function initializeCartData() {
+    console.log('🔄 מאתחל נתוני עגלות...');
+    
     const cartData = {};
     
     Object.keys(CONFIG.carts).forEach(cartId => {
         const cart = CONFIG.carts[cartId];
         cartData[cartId] = {
             name: cart.name,
-            description: cart.description,
+            description: cart.description || '',
             computers: generateComputerList(cart.computerPrefix, cart.computerCount)
         };
+        
+        console.log(`📦 ${cart.name}: ${cart.computerCount} מחשבים (${cart.computerPrefix})`);
     });
     
     return cartData;
 }
 
-// ייצוא להשימוש במערכת
+// הרץ בדיקת תקינות
+if (validateConfig()) {
+    console.log('✅ config.js נטען בהצלחה! 🎉');
+} else {
+    console.error('❌ יש בעיות בקובץ config.js');
+}
+
+// Export למקרה של סביבות Node.js
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { CONFIG, generateComputerList, initializeCartData };
+}
+
+// הוסף את CONFIG לחלון הגלובלי
+if (typeof window !== 'undefined') {
+    window.CONFIG = CONFIG;
+    console.log('🌐 CONFIG זמין בחלון הגלובלי');
 }
